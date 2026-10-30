@@ -34,3 +34,13 @@ $routes->get('api/calendar', 'Calendar::index');
 $routes->post('api/calendar/create', 'Calendar::create');
 $routes->post('api/calendar/update/(:num)', 'Calendar::update/$1');
 $routes->post('api/calendar/delete/(:num)', 'Calendar::delete/$1');
+
+// Super Admin User Management
+$routes->get('api/users', 'Users::index');
+$routes->post('api/users/assign-role', 'Users::assignAdmin');
+$routes->post('api/users/create', 'Users::createUser');
+
+// Forgot Password
+$routes->post('api/forgot/request-otp', 'ForgotPassword::requestOtp');
+$routes->post('api/forgot/verify-otp', 'ForgotPassword::verifyOtp');
+$routes->post('api/forgot/reset-password', 'ForgotPassword::resetPassword');

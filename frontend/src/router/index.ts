@@ -4,7 +4,6 @@ import { useAuthStore } from '@/stores/auth'
 const routes = [
   { path: '/', redirect: '/home' },
   { path: '/login', component: () => import('@/views/Login.vue'), meta: { public: true } },
-  { path: '/register', component: () => import('@/views/Register.vue'), meta: { public: true } },
   {
     path: '/',
     component: () => import('@/components/Layout.vue'),
@@ -14,7 +13,8 @@ const routes = [
       { path: 'cart', component: () => import('@/views/Cart.vue') },
       { path: 'calendar', component: () => import('@/views/Calendar.vue') },
       { path: 'admin/products', component: () => import('@/views/AdminProducts.vue'), meta: { admin: true } },
-      { path: 'admin/calendar', component: () => import('@/views/AdminCalendar.vue'), meta: { admin: true } }
+      { path: 'admin/calendar', component: () => import('@/views/AdminCalendar.vue'), meta: { admin: true } },
+      { path: 'superadmin/users', component: () => import('@/views/SuperAdminUsers.vue'), meta: { superadmin: true } }
     ]
   }
 ]
@@ -25,7 +25,8 @@ router.beforeEach((to) => {
   const auth = useAuthStore()
   if (!to.meta.public && !auth.isLoggedIn) return '/login'
   if (to.meta.public && auth.isLoggedIn) return '/home'
-  if (to.meta.admin && auth.user?.role !== 'admin') return '/home'
+  if (to.meta.admin && !['admin', 'super_admin'].includes(auth.user?.role)) return '/home'
+  if (to.meta.superadmin && auth.user?.role !== 'super_admin') return '/home'
 })
 
 export default router
