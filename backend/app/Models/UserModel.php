@@ -8,7 +8,12 @@ class UserModel extends Model
 {
     protected $table = 'users';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['username', 'email', 'password', 'full_name', 'role', 'is_active'];
+    protected $allowedFields = [
+        'username', 'email', 'password', 'full_name', 
+        'first_name', 'middle_name', 'last_name', 'extension_name',
+        'atbi_affiliation', 'phone_number', 'role', 
+        'is_active', 'status', 'reset_otp', 'reset_otp_expires'
+    ];
     protected $returnType = 'object';
     protected $useTimestamps = false;
 
@@ -17,7 +22,7 @@ class UserModel extends Model
 
     protected function hashPassword(array $data)
     {
-        if (isset($data['data']['password'])) {
+        if (isset($data['data']['password']) && !empty($data['data']['password'])) {
             $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
         }
         return $data;

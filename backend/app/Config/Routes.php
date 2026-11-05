@@ -29,9 +29,6 @@ $routes->post('api/cart/update/(:num)', 'Cart::updateItem/$1');
 $routes->post('api/cart/remove/(:num)', 'Cart::remove/$1');
 $routes->post('api/cart/clear', 'Cart::clear');
 
-// Calendar (User)
-$routes->get('api/calendar', 'Calendar::index');
-
 // Calendar
 $routes->get('api/calendar', 'Calendar::index');
 $routes->get('api/calendar/archived', 'Calendar::archived');
@@ -41,10 +38,11 @@ $routes->post('api/calendar/archive/(:num)', 'Calendar::archive/$1');
 $routes->post('api/calendar/restore/(:num)', 'Calendar::restore/$1');
 $routes->post('api/calendar/delete/(:num)', 'Calendar::deletePermanent/$1');
 
-// Super Admin User Management
+// User Management
 $routes->get('api/users', 'Users::index');
 $routes->post('api/users/assign-role', 'Users::assignAdmin');
-$routes->post('api/users/create', 'Users::createUser');
+$routes->post('api/users/approve', 'Users::approveUser');
+$routes->post('api/users/reject', 'Users::rejectUser');
 
 // Forgot Password
 $routes->post('api/forgot/request-otp', 'ForgotPassword::requestOtp');

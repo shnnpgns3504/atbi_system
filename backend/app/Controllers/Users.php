@@ -14,16 +14,12 @@ class Users extends BaseController
         $data = $this->request->getJSON(true) ?? $this->request->getPost();
         $requesterId = (int)($data['requester_id'] ?? $this->request->getGet('requester_id') ?? 0);
         
-        if (!$requesterId) {
-            return null;
-        }
+        if (!$requesterId) return null;
 
         $userModel = new UserModel();
         $requester = $userModel->find($requesterId);
 
-        if (!$requester || $requester->role !== 'admin') {
-            return null;
-        }
+        if (!$requester || $requester->role !== 'admin') return null;
 
         return $requester;
     }
@@ -35,77 +31,87 @@ class Users extends BaseController
         }
 
         $userModel = new UserModel();
-        $users = $userModel->select('user_id, username, email, full_name, role, is_active, created_at')
+        $users = $userModel->select('user_id, username, email, full_name, role, is_active, status, atbi_affiliation, phone_number, created_at')
+                          ->orderBy('status', 'ASC')
                           ->orderBy('created_at', 'DESC')
                           ->findAll();
 
         return $this->respond(['success' => true, 'data' => $users]);
     }
 
-    public function assignAdmin()
+    public function approveUser()
     {
         if (!$this->requireAdmin()) {
             return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
         }
 
         $data = $this->request->getJSON(true) ?? $this->request->getPost();
-        $targetUserId = (int)($data['user_id'] ?? 0);
-        $newRole = $data['role'] ?? 'user';
-
-        if (!in_array($newRole, ['user', 'admin'])) {
-            return $this->respond(['success' => false, 'message' => 'Invalid role. Only user or admin allowed.'], 400);
-        }
-
         $userModel = new UserModel();
-        $target = $userModel->find($targetUserId);
+        
+        // 1. Update status to approved
+        $userModel->update($data['user_id'], ['status' => 'approved']);
 
-        if (!$target) {
-            return $this->respond(['success' => false, 'message' => 'User not found'], 404);
+        // 2. Fetch the user to get their email
+        $user = $userModel->find($data['user_id']);
+
+        // 3. Send the approval email
+        if ($user && !empty($user->email)) {
+            $email = \Config\Services::email();
+            $email->setTo($user->email);
+            $email->setSubject('ATBI Intertrade System - Account Approved');
+            
+            $message = "
+            <html>
+            <body style='font-family: Arial, sans-serif;'>
+                <div style='max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+                    <h2 style='color: #047857;'>Account Approved!</h2>
+                    <p>Hello <strong>{$user->first_name} {$user->last_name}</strong>,</p>
+                    <p>Your registration for the ATBI Intertrade System has been successfully approved by the administrator.</p>
+                    <p>You can now log in using your registered username and password.</p>
+                    <br>
+                    <p>Thank you,<br>ATBI Administration</p>
+                </div>
+            </body>
+            </html>
+            ";
+
+            $email->setMessage($message);
+            $email->setMailType('html');
+            
+            if (!$email->send()) {
+                log_message('error', 'Failed to send approval email to: ' . $user->email);
+            }
         }
 
-        $requesterId = (int)($data['requester_id'] ?? 0);
-        if ($target->user_id === $requesterId) {
+        return $this->respond(['success' => true, 'message' => 'User approved successfully and email sent.']);
+    }
+
+    public function rejectUser()
+    {
+        if (!$this->requireAdmin()) {
+            return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
+        }
+
+        $data = $this->request->getJSON(true) ?? $this->request->getPost();
+        $userModel = new UserModel();
+        $userModel->update($data['user_id'], ['status' => 'rejected']);
+
+        return $this->respond(['success' => true, 'message' => 'User rejected successfully']);
+    }
+
+    public function assignAdmin()
+    {
+        if (!$this->requireAdmin()) return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
+
+        $data = $this->request->getJSON(true) ?? $this->request->getPost();
+        $userModel = new UserModel();
+        $target = $userModel->find($data['user_id']);
+
+        if ($target->user_id === $data['requester_id']) {
             return $this->respond(['success' => false, 'message' => 'Cannot change your own role'], 400);
         }
 
-        $userModel->update($targetUserId, ['role' => $newRole]);
-
-        return $this->respond([
-            'success' => true,
-            'message' => "User role updated to {$newRole}"
-        ]);
-    }
-
-    public function createUser()
-    {
-        if (!$this->requireAdmin()) {
-            return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
-        }
-
-        $data = $this->request->getJSON(true) ?? $this->request->getPost();
-
-        $rules = [
-            'username' => 'required|min_length[3]|is_unique[users.username]',
-            'email' => 'required|valid_email|is_unique[users.email]',
-            'password' => 'required|min_length[6]',
-            'full_name' => 'required|min_length[3]',
-            'role' => 'required|in_list[user,admin]'
-        ];
-
-        if (!$this->validate($rules)) {
-            return $this->respond(['success' => false, 'errors' => $this->validator->getErrors()], 400);
-        }
-
-        $userModel = new UserModel();
-        $id = $userModel->insert([
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'full_name' => $data['full_name'],
-            'role' => $data['role'],
-            'is_active' => 1
-        ]);
-
-        return $this->respond(['success' => true, 'message' => 'User created', 'user_id' => $id], 201);
+        $userModel->update($data['user_id'], ['role' => $data['role']]);
+        return $this->respond(['success' => true, 'message' => "Role updated to {$data['role']}"]);
     }
 }

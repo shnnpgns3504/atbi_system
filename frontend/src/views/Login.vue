@@ -1,244 +1,256 @@
 <template>
-  <div class="min-h-screen w-full flex flex-col md:flex-row">
-    <!-- LEFT: Brand Logos Panel with Animated Background -->
+  <div class="min-h-screen w-full flex flex-col md:flex-row overflow-hidden bg-gray-50">
+    
+    <!-- LEFT: Brand Logos Panel (Animated Background) -->
     <div
-      class="relative animated-gradient
-             flex items-center justify-center p-6 md:p-12 overflow-hidden
-             min-h-[45vh] md:min-h-screen md:w-1/2"
+      class="relative animated-gradient flex flex-col items-center justify-center p-8 md:p-12 overflow-hidden min-h-[40vh] md:min-h-screen md:w-1/2 shadow-2xl z-10"
     >
-      <!-- Decorative blobs (kept as is) -->
       <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
       <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"></div>
 
       <div class="relative z-10 text-center max-w-md w-full flex flex-col items-center">
-        
-        <!-- MAIN SYSTEM LOGO -->
         <img 
-            src="/logos/main.png" 
-            alt="Intertrade Logo" 
-            class="w-62 h-62 md:w-74 md:h-74 object-cover rounded-full bg-white p-2 mb-6 drop-shadow-2xl border-4 border-white/20" 
-          />
-
-        <!-- MAIN TITLE (Playfair Display) -->
-        <h1 class="font-playfair text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight drop-shadow-md">
+          src="/logos/main.png" 
+          alt="Intertrade Logo" 
+          class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-full bg-white p-2 mb-8 drop-shadow-2xl border-4 border-white/20" 
+        />
+        <h1 class="font-playfair text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight drop-shadow-md text-center">
           ATBI Intertrade System
         </h1>
-        
-        <p class="text-white/90 text-sm md:text-base mb-8 md:mb-12 drop-shadow">
+        <p class="text-white/90 text-sm md:text-base mb-10 drop-shadow text-center">
           Agribased Technology Business Incubator
         </p>
 
-        <div class="grid grid-cols-3 gap-3 md:gap-4 w-full">
-          <div
-            v-for="(atbi, i) in atbiLogos"
-            :key="i"
-            class="bg-white/95 backdrop-blur rounded-xl p-3 md:p-4 shadow-lg 
-                   hover:scale-105 transition-transform duration-300 flex items-center justify-center
-                   aspect-square"
+        <div class="grid grid-cols-3 gap-3 md:gap-5 w-full">
+          <div 
+            v-for="(atbi, i) in atbiLogos" 
+            :key="i" 
+            class="bg-white/95 backdrop-blur rounded-2xl p-3 md:p-4 shadow-xl flex items-center justify-center aspect-square hover:scale-105 transition-transform duration-300"
           >
-            <img
-              :src="atbi.logo"
-              :alt="atbi.name"
-              class="w-full h-full object-contain"
-              @error="handleImgError($event, i)"
-            />
+            <img :src="atbi.logo" :alt="atbi.name" class="w-full h-full object-contain" />
           </div>
         </div>
-
-        <p class="mt-6 md:mt-10 text-white/80 text-xs md:text-sm">
-          &copy; 2026 <span class="font-bold text-white">ATBI Intertrade System</span>. All rights reserved.
+        
+        <p class="mt-12 text-white/70 text-xs md:text-sm">
+          &copy; 2026 ATBI Intertrade System. All rights reserved.
         </p>
       </div>
     </div>
 
-    <!-- RIGHT: Login Form -->
-    <div
-      class="flex-1 flex items-center justify-center bg-gray-50 p-6 md:p-8
-             md:w-1/2 min-h-[55vh] md:min-h-screen"
-    >
-      <div class="w-full max-w-sm">
-        <div class="text-center mb-8">
-          <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Welcome Back</h2>
-          <p class="text-gray-500 mt-2 text-sm md:text-base">Sign in to your account</p>
-        </div>
+    <!-- RIGHT: Forms Container -->
+    <div class="flex-1 flex items-center justify-center p-4 md:p-8 md:w-1/2 relative bg-gray-50">
+      
+      <!-- THE FORM BOX WITH GRADIENT BORDER -->
+      <div class="w-full max-w-md bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 p-[2px] rounded-2xl shadow-2xl">
+        <div class="bg-white rounded-2xl p-8 h-full relative overflow-hidden">
+          
+          <transition name="slide-fade" mode="out-in">
+            
+            <!-- LOGIN FORM -->
+            <div v-if="!isRegistering" key="login" class="w-full">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold text-gray-800">Welcome Back</h2>
+                <p class="text-gray-500 mt-2">Sign in to continue to your account</p>
+              </div>
 
-        <form @submit.prevent="handleLogin" class="space-y-4 md:space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
-            <input
-              v-model="username"
-              type="text"
-              required
-              autocomplete="username"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 
-                     focus:border-transparent transition text-base"
-              placeholder="Enter your username"
-            />
-          </div>
+              <form @submit.prevent="handleLogin" class="space-y-5">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1.5">Username <span class="text-red-500">*</span></label>
+                  <input 
+                    v-model="username" 
+                    type="text" 
+                    required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all" 
+                    placeholder="Enter your username" 
+                  />
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <input 
+                      v-model="password" 
+                      :type="showPassword ? 'text' : 'password'" 
+                      required 
+                      class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all" 
+                      placeholder="Enter your password" 
+                    />
+                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                    </button>
+                  </div>
+                </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-            <div class="relative">
-              <input
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                autocomplete="current-password"
-                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg 
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500 
-                       focus:border-transparent transition text-base"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-              >
-                <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                </svg>
-              </button>
+                <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm font-medium">
+                  {{ error }}
+                </div>
+
+                <button type="submit" :disabled="loading" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 mt-4">
+                  {{ loading ? 'Signing in...' : 'Sign In' }}
+                </button>
+                
+                <div class="flex justify-between items-center pt-2">
+                  <button type="button" @click="openForgotModal" class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">Forgot Password?</button>
+                  <button type="button" @click="isRegistering = true" class="text-sm font-bold text-blue-600 hover:text-blue-700 hover:underline">Create Account →</button>
+                </div>
+              </form>
             </div>
-          </div>
 
-          <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {{ error }}
-          </div>
+            <!-- REGISTER FORM -->
+            <div v-else key="register" class="w-full">
+              <div class="text-center mb-6">
+                <h2 class="text-2xl font-extrabold text-gray-800">Create Account</h2>
+                <p class="text-gray-500 mt-1 text-xs">Wait for admin approval after registering</p>
+              </div>
 
-          <button
-            type="submit"
-            :disabled="loading"
-            class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white 
-                   rounded-lg font-semibold text-base disabled:opacity-50 
-                   transition-colors shadow-md hover:shadow-lg"
-          >
-            {{ loading ? 'Signing in...' : 'Sign In' }}
-          </button>
+              <form @submit.prevent="handleRegister" class="space-y-4">
+                
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Username <span class="text-red-500">*</span></label>
+                  <input v-model="regForm.username" type="text" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all" placeholder="e.g. juan123" />
+                </div>
 
-          <div class="text-center pt-2">
-            <button
-              type="button"
-              @click="openForgotModal"
-              class="text-sm text-emerald-600 hover:text-emerald-700 hover:underline font-medium"
-            >
-              Forgot Password?
-            </button>
-          </div>
-        </form>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
+                    <input v-model="regForm.first_name" type="text" required @input="regForm.first_name = $event.target.value.replace(/[^a-zA-Z\s.]/g, '')" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="Juan" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Middle Name</label>
+                    <input v-model="regForm.middle_name" type="text" @input="regForm.middle_name = $event.target.value.replace(/[^a-zA-Z\s.]/g, '')" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="Santos" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
+                    <input v-model="regForm.last_name" type="text" required @input="regForm.last_name = $event.target.value.replace(/[^a-zA-Z\s.]/g, '')" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="Dela Cruz" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Ext Name</label>
+                    <input v-model="regForm.extension_name" type="text" @input="regForm.extension_name = $event.target.value.replace(/[^a-zA-Z\s.]/g, '')" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="Jr., III" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Email (Gmail) <span class="text-red-500">*</span></label>
+                  <input 
+                    v-model="regForm.email" 
+                    type="email" 
+                    required 
+                    class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
+                    :class="emailError ? 'border-red-400 focus:border-red-400' : 'border-gray-300'"
+                    placeholder="juan@gmail.com" 
+                  />
+                  <p v-if="emailError" class="text-xs text-red-500 mt-1 font-medium">{{ emailError }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">ATBI Affiliation <span class="text-red-500">*</span></label>
+                    <input v-model="regForm.atbi_affiliation" type="text" required @input="regForm.atbi_affiliation = $event.target.value.replace(/[^a-zA-Z\s.]/g, '')" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="ATBI 1" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
+                    <input 
+                      v-model="regForm.phone_number" 
+                      type="text" 
+                      required 
+                      @input="regForm.phone_number = $event.target.value.replace(/\D/g, '').slice(0, 11)" 
+                      class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
+                      :class="phoneError ? 'border-red-400 focus:border-red-400' : 'border-gray-300'"
+                      placeholder="09123456789" 
+                    />
+                    <p v-if="phoneError" class="text-xs text-red-500 mt-1 font-medium">{{ phoneError }}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <input v-model="regForm.password" :type="showRegPassword ? 'text' : 'password'" required class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="Create a password" />
+                    <button type="button" @click="showRegPassword = !showRegPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <svg v-if="!showRegPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                    </button>
+                  </div>
+                  <div class="mt-2 space-y-1">
+                    <p class="text-xs font-medium" :class="hasLength ? 'text-emerald-600' : 'text-gray-400'">✓ At least 8 characters</p>
+                    <p class="text-xs font-medium" :class="hasUppercase ? 'text-emerald-600' : 'text-gray-400'">✓ At least 1 uppercase letter</p>
+                    <p class="text-xs font-medium" :class="hasLowercase ? 'text-emerald-600' : 'text-gray-400'">✓ At least 1 lowercase letter</p>
+                    <p class="text-xs font-medium" :class="hasNumber ? 'text-emerald-600' : 'text-gray-400'">✓ At least 1 number</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <input v-model="regForm.confirm_password" :type="showRegConfirm ? 'text' : 'password'" required class="w-full px-4 py-2.5 pr-10 border rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all" :class="passwordsMismatch ? 'border-red-400' : 'border-gray-300'" placeholder="Re-type your password" />
+                    <button type="button" @click="showRegConfirm = !showRegConfirm" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <svg v-if="!showRegConfirm" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                    </button>
+                  </div>
+                  <p v-if="passwordsMismatch" class="text-xs text-red-500 mt-1 font-medium">Passwords do not match</p>
+                </div>
+
+                <div v-if="regError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm font-medium">
+                  {{ regError }}
+                </div>
+
+                <button type="submit" :disabled="regLoading || passwordsMismatch || !!emailError || !!phoneError" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all mt-2 disabled:opacity-50">
+                  {{ regLoading ? 'Submitting...' : 'Register' }}
+                </button>
+
+                <div class="text-center pt-2 pb-2">
+                  <button type="button" @click="isRegistering = false" class="text-sm font-bold text-gray-600 hover:text-gray-800 hover:underline">← Back to Login</button>
+                </div>
+              </form>
+            </div>
+
+          </transition>
+        </div>
       </div>
     </div>
 
-    <!-- Forgot Password Modal -->
-    <transition name="modal-fade">
-      <div
-        v-if="showForgotModal"
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
-        @click.self="closeForgot"
-      >
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-          <!-- Step 1 -->
-          <div v-if="forgotStep === 'request'">
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Forgot Password</h3>
-            <p class="text-sm text-gray-500 mb-5">Enter your email or username to receive a reset OTP.</p>
-            <input
-              v-model="forgotIdentifier"
-              type="text"
-              placeholder="Email or username"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
-            />
-            <div v-if="forgotError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
-              {{ forgotError }}
-            </div>
-            <div class="flex gap-2">
-              <button @click="closeForgot" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
-                Cancel
-              </button>
-              <button @click="requestOtp" :disabled="forgotLoading"
-                class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium disabled:opacity-50">
-                {{ forgotLoading ? 'Sending...' : 'Send OTP' }}
-              </button>
-            </div>
+    <!-- Registration Success Modal -->
+    <transition name="fade">
+      <div v-if="showSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
+          <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 mb-5">
+            <span class="text-4xl">✅</span>
           </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Registration Submitted!</h3>
+          <p class="text-sm text-gray-500 mb-8 leading-relaxed">Your account is now pending. Please wait for the admin to approve your registration.</p>
+          <button @click="showSuccessModal = false; isRegistering = false" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md transition-colors">Got it</button>
+        </div>
+      </div>
+    </transition>
 
-          <!-- Step 2 -->
-          <div v-if="forgotStep === 'verify'">
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Enter OTP</h3>
-            <p class="text-sm text-gray-500 mb-5">Enter the 6-digit OTP sent to your email.</p>
-            <input
-              v-model="forgotOtp"
-              type="text"
-              maxlength="6"
-              placeholder="6-digit OTP"
-              inputmode="numeric"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                     text-center text-xl tracking-widest font-mono
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
-            />
-            <div v-if="forgotDebugOtp" class="text-xs text-emerald-600 bg-emerald-50 p-2 rounded mb-4 text-center">
-              🔑 Test OTP: <strong>{{ forgotDebugOtp }}</strong>
-            </div>
-            <div v-if="forgotError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
-              {{ forgotError }}
-            </div>
-            <div class="flex gap-2">
-              <button @click="forgotStep = 'request'" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
-                Back
-              </button>
-              <button @click="verifyOtp" :disabled="forgotLoading"
-                class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium disabled:opacity-50">
-                {{ forgotLoading ? 'Verifying...' : 'Verify' }}
-              </button>
-            </div>
+    <!-- Login Success Modal -->
+    <transition name="fade">
+      <div v-if="showLoginSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
+          <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 mb-5 animate-bounce-slow">
+            <span class="text-4xl">👋</span>
           </div>
-
-          <!-- Step 3 -->
-          <div v-if="forgotStep === 'reset'">
-            <h3 class="text-xl font-bold text-gray-800 mb-2">New Password</h3>
-            <p class="text-sm text-gray-500 mb-5">Choose a new password.</p>
-            <input
-              v-model="forgotNewPassword"
-              type="password"
-              placeholder="New password (6+ chars)"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-3"
-            />
-            <input
-              v-model="forgotConfirmPassword"
-              type="password"
-              placeholder="Confirm password"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
-            />
-            <div v-if="forgotError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
-              {{ forgotError }}
-            </div>
-            <div class="flex gap-2">
-              <button @click="closeForgot" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
-                Cancel
-              </button>
-              <button @click="resetPassword" :disabled="forgotLoading"
-                class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium disabled:opacity-50">
-                {{ forgotLoading ? 'Resetting...' : 'Reset Password' }}
-              </button>
-            </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back!</h3>
+          <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+            You have successfully signed in as <span class="font-bold text-emerald-600">{{ loggedInName }}</span>. Redirecting to your dashboard...
+          </p>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-emerald-500 h-2 rounded-full animate-progress"></div>
           </div>
         </div>
       </div>
     </transition>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import axiosClient from '@/axios'
@@ -246,23 +258,50 @@ import axiosClient from '@/axios'
 const router = useRouter()
 const auth = useAuthStore()
 
-const username = ref('')
-const password = ref('')
+const isRegistering = ref(false)
 const showPassword = ref(false)
+const showRegPassword = ref(false)
+const showRegConfirm = ref(false)
 const loading = ref(false)
 const error = ref('')
 
-// Forgot Password State
-const showForgotModal = ref(false)
-const forgotStep = ref<'request' | 'verify' | 'reset'>('request')
-const forgotIdentifier = ref('')
-const forgotOtp = ref('')
-const forgotNewPassword = ref('')
-const forgotConfirmPassword = ref('')
-const forgotUserId = ref(0)
-const forgotLoading = ref(false)
-const forgotError = ref('')
-const forgotDebugOtp = ref('')
+// LOGIN
+const username = ref('')
+const password = ref('')
+
+// REGISTER
+const regLoading = ref(false)
+const regError = ref('')
+const showSuccessModal = ref(false)
+
+// LOGIN SUCCESS MODAL
+const showLoginSuccessModal = ref(false)
+const loggedInName = ref('')
+
+const regForm = reactive({
+  username: '', first_name: '', middle_name: '', last_name: '', extension_name: '',
+  email: '', atbi_affiliation: '', phone_number: '', password: '', confirm_password: ''
+})
+
+// Live Password Rules
+const hasLength = computed(() => regForm.password.length >= 8)
+const hasUppercase = computed(() => /[A-Z]/.test(regForm.password))
+const hasLowercase = computed(() => /[a-z]/.test(regForm.password))
+const hasNumber = computed(() => /\d/.test(regForm.password))
+const passwordsMismatch = computed(() => regForm.confirm_password !== '' && regForm.password !== regForm.confirm_password)
+
+// Live Validation
+const emailError = computed(() => {
+  if (!regForm.email) return ''
+  if (!regForm.email.toLowerCase().endsWith('@gmail.com')) return 'Must be a valid @gmail.com address.'
+  return ''
+})
+
+const phoneError = computed(() => {
+  if (!regForm.phone_number) return ''
+  if (regForm.phone_number.length !== 11) return 'Must be exactly 11 digits.'
+  return ''
+})
 
 const atbiLogos = [
   { name: 'BSU', logo: '/logos/bsu.png' },
@@ -273,18 +312,6 @@ const atbiLogos = [
   { name: 'PSU', logo: '/logos/psu.png' }
 ]
 
-function handleImgError(e: Event, index: number) {
-  const img = e.target as HTMLImageElement
-  img.style.display = 'none'
-  const parent = img.parentElement
-  if (parent && !parent.querySelector('.fallback')) {
-    const span = document.createElement('span')
-    span.className = 'fallback text-emerald-700 font-bold text-xs md:text-sm'
-    span.textContent = `ATBI ${index + 1}`
-    parent.appendChild(span)
-  }
-}
-
 async function handleLogin() {
   loading.value = true
   error.value = ''
@@ -292,7 +319,19 @@ async function handleLogin() {
     const data = await auth.login(username.value, password.value)
     if (data.success) {
       await auth.loadCartCount()
-      router.push('/home')
+      
+      // Extract first name for the welcome message
+      loggedInName.value = data.user.full_name.split(' ')[0] || data.user.username
+      
+      // Show the success modal
+      showLoginSuccessModal.value = true
+      
+      // Wait 1.5 seconds before redirecting
+      setTimeout(() => {
+        showLoginSuccessModal.value = false
+        router.push('/home')
+      }, 1500)
+
     } else {
       error.value = data.message || 'Invalid credentials'
     }
@@ -303,136 +342,82 @@ async function handleLogin() {
   }
 }
 
-function openForgotModal() {
-  showForgotModal.value = true
-  forgotStep.value = 'request'
-  forgotIdentifier.value = ''
-  forgotOtp.value = ''
-  forgotNewPassword.value = ''
-  forgotConfirmPassword.value = ''
-  forgotError.value = ''
-  forgotDebugOtp.value = ''
-}
-
-function closeForgot() {
-  showForgotModal.value = false
-}
-
-async function requestOtp() {
-  if (!forgotIdentifier.value) {
-    forgotError.value = 'Please enter your email or username'
+async function handleRegister() {
+  regLoading.value = true
+  regError.value = ''
+  
+  if (emailError.value || phoneError.value) {
+    regLoading.value = false
     return
   }
-  forgotLoading.value = true
-  forgotError.value = ''
+
   try {
-    const { data } = await axiosClient.post('/forgot/request-otp', {
-      identifier: forgotIdentifier.value
-    })
+    const { data } = await axiosClient.post('/auth/register', regForm)
     if (data.success) {
-      forgotUserId.value = data.user_id
-      forgotDebugOtp.value = data.debug_otp || ''
-      forgotStep.value = 'verify'
+      showSuccessModal.value = true
+      Object.assign(regForm, { username: '', first_name: '', middle_name: '', last_name: '', extension_name: '', email: '', atbi_affiliation: '', phone_number: '', password: '', confirm_password: '' })
     } else {
-      forgotError.value = data.message
+      regError.value = Object.values(data.errors || {})[0] || data.message
     }
   } catch (e: any) {
-    forgotError.value = e.response?.data?.message || 'Failed to send OTP'
+    regError.value = Object.values(e.response?.data?.errors || {})[0] || e.response?.data?.message || 'Registration failed'
   } finally {
-    forgotLoading.value = false
+    regLoading.value = false
   }
 }
 
-async function verifyOtp() {
-  if (!forgotOtp.value || forgotOtp.value.length !== 6) {
-    forgotError.value = 'Please enter the 6-digit OTP'
-    return
-  }
-  forgotLoading.value = true
-  forgotError.value = ''
-  try {
-    const { data } = await axiosClient.post('/forgot/verify-otp', {
-      user_id: forgotUserId.value,
-      otp: forgotOtp.value
-    })
-    if (data.success) {
-      forgotStep.value = 'reset'
-    } else {
-      forgotError.value = data.message
-    }
-  } catch (e: any) {
-    forgotError.value = e.response?.data?.message || 'Invalid OTP'
-  } finally {
-    forgotLoading.value = false
-  }
-}
-
-async function resetPassword() {
-  if (!forgotNewPassword.value || forgotNewPassword.value.length < 6) {
-    forgotError.value = 'Password must be at least 6 characters'
-    return
-  }
-  if (forgotNewPassword.value !== forgotConfirmPassword.value) {
-    forgotError.value = 'Passwords do not match'
-    return
-  }
-  forgotLoading.value = true
-  forgotError.value = ''
-  try {
-    const { data } = await axiosClient.post('/forgot/reset-password', {
-      user_id: forgotUserId.value,
-      otp: forgotOtp.value,
-      new_password: forgotNewPassword.value
-    })
-    if (data.success) {
-      alert('Password reset successfully! Please login.')
-      closeForgot()
-    } else {
-      forgotError.value = data.message
-    }
-  } catch (e: any) {
-    forgotError.value = e.response?.data?.message || 'Failed to reset'
-  } finally {
-    forgotLoading.value = false
-  }
-}
+const showForgotModal = ref(false)
+function openForgotModal() { showForgotModal.value = true }
 </script>
 
 <style scoped>
-/* IMPORT PLAYFAIR DISPLAY FONT */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
-/* APPLY THE FONT TO THE CLASS */
-.font-playfair {
-  font-family: 'Playfair Display', serif;
+/* Slide Fade Transition for Forms */
+.slide-fade-enter-active {
+  transition: all 0.4s ease-out;
 }
-
-/* --- ANIMATED GRADIENT BACKGROUND --- */
-.animated-gradient {
-  background: linear-gradient(-45deg, #064e3b, #047857, #0ea5e9, #0369a1);
-  background-size: 400% 400%;
-  animation: gradientShift 12s ease infinite;
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-/* ------------------------------------ */
-
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
+.slide-fade-enter-from {
+  transform: translateX(20px);
   opacity: 0;
+}
+.slide-fade-leave-to {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+.animated-gradient { 
+  background: linear-gradient(-45deg, #064e3b, #047857, #0ea5e9, #0369a1); 
+  background-size: 400% 400%; 
+  animation: gradientShift 12s ease infinite; 
+}
+@keyframes gradientShift { 
+  0% { background-position: 0% 50%; } 
+  50% { background-position: 100% 50%; } 
+  100% { background-position: 0% 50%; } 
+}
+
+.font-playfair { font-family: 'Playfair Display', serif; }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* Animations for the Login Success Modal */
+.animate-bounce-slow {
+  animation: bounce 1.5s infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+  50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+}
+
+.animate-progress {
+  width: 0%;
+  animation: load 1.5s ease-in-out forwards;
+}
+@keyframes load {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 </style>
