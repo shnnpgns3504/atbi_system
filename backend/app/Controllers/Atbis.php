@@ -16,12 +16,18 @@ class Atbis extends BaseController
         return $this->respond(['success' => true, 'data' => $atbiModel->getActive()]);
     }
 
-    public function show($slug)
+    public function show($identifier)
     {
         $atbiModel = new AtbiModel();
         $productModel = new ProductModel();
 
-        $atbi = $atbiModel->getBySlug($slug);
+        // Check if the identifier is a number (atbi_id) or a string (slug)
+        if (is_numeric($identifier)) {
+            $atbi = $atbiModel->find($identifier);
+        } else {
+            $atbi = $atbiModel->getBySlug($identifier);
+        }
+
         if (!$atbi) {
             return $this->respond(['success' => false, 'message' => 'ATBI not found'], 404);
         }

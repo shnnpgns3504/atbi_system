@@ -9,12 +9,12 @@ const routes = [
     component: () => import('@/components/Layout.vue'),
     children: [
       { path: 'home', component: () => import('@/views/Home.vue') },
-      { path: 'atbi/:slug', component: () => import('@/views/AtbiDetail.vue') },
+      { path: 'about', component: () => import('@/views/About.vue') }, // ADDED THIS
+      { path: 'atbi/:id', component: () => import('@/views/AtbiDetail.vue') },
       { path: 'cart', component: () => import('@/views/Cart.vue') },
       { path: 'calendar', component: () => import('@/views/Calendar.vue') },
       { path: 'admin/products', component: () => import('@/views/AdminProducts.vue'), meta: { admin: true } },
       { path: 'admin/calendar', component: () => import('@/views/AdminCalendar.vue'), meta: { admin: true } },
-      { path: 'admin/calendar/archive', component: () => import('@/views/ArchivedCalendar.vue'), meta: { admin: true } },
       { path: 'admin/users', component: () => import('@/views/SuperAdminUsers.vue'), meta: { admin: true } }
     ]
   }

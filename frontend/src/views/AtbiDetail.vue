@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axiosClient from '@/axios'
 import { useAuthStore } from '@/stores/auth'
@@ -79,11 +79,21 @@ async function addToCart(product: any) {
   finally { adding.value = null }
 }
 
-onMounted(async () => {
+async function loadAtbi() {
+  loading.value = true
   try {
-    const { data } = await axiosClient.get(`/atbis/${route.params.slug}`)
+    const { data } = await axiosClient.get(`/atbis/${route.params.id}`)
     if (data.success) atbi.value = data.data
-  } catch (e) { console.error(e) }
-  finally { loading.value = false }
+  } catch (e) { 
+    console.error(e) 
+  } finally { 
+    loading.value = false 
+  }
+}
+
+onMounted(loadAtbi)
+
+watch(() => route.params.id, () => {
+  loadAtbi()
 })
 </script>

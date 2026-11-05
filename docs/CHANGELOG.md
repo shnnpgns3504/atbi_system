@@ -99,3 +99,93 @@
   - Added a new "Welcome Back" success modal that appears immediately after a successful login.
   - The modal displays the user's first name and features a bouncing wave emoji and a progress bar animation.
   - Added a 1.5-second delay before redirecting the user to the dashboard so they can see the welcome message.
+
+## [Version 2.1] - Global Layout & Navigation Enhancements
+**Date:** November 6, 2026
+**Changes:**
+- **Frontend (Layout.vue):**
+  - **Header:** Added a fixed top header with a blue/green gradient. Includes the system logo, system title, and a user profile section on the right.
+  - **Navbar:** Added a secondary navigation bar below the header for quick access to the 6 ATBIs and an "About" page.
+  - **Footer:** Added a new footer containing the 6 ATBI logos (3 on left, 3 on right), with the main system logo and copyright in the center.
+  - **Sidebar:** Kept the original sidebar design intact for main navigation and admin controls.
+- **Frontend (About.vue):**
+  - Created a brand new "About Us" page with sample mission and information data.
+- **Frontend (Router):**
+  - Added the `/about` route to the router configuration.
+
+
+# ATBI Intertrade System - Master Changelog
+
+This notebook contains all major updates, database changes, and file modifications made to the system.
+
+## [Version 2.7] - Layout Perfection & ATBI Page Routing Fix
+**Date:** November 6, 2026
+**Changes:**
+- **Backend (Atbis.php):** Updated the `show()` method to accept either a numeric `atbi_id` OR a text `slug`. This fixed the issue where ATBI pages were showing blank because the frontend was sending an ID while the backend expected a slug.
+- **Frontend (AtbiDetail.vue):** Added a `watch` on `route.params.id` so clicking between different ATBIs (e.g., ATBI 1 to ATBI 2) automatically re-fetches the data without needing to go back to the Home page.
+- **Frontend (Layout.vue):** 
+  - Restructured the layout to match the Footer perfectly. The Header and Navbar now sit only over the Main Content area, ensuring they never overlap the Sidebar.
+  - Removed the "Home" button from the top Navbar (it remains in the Sidebar).
+  - Changed the ATBI Navbar links to use the numeric `atbi_id` instead of the slug to guarantee perfect routing.
+- **Database Update:** 
+  - Confirmed the ability to rename ATBIs via the `name` column in the `atbis` table. 
+  - **Rule:** The `name` column can be changed, but the `slug` column MUST remain `atbi-1`, `atbi-2`, etc., to prevent logo mapping issues.
+
+## [Version 2.6] - UI Enhancements & Card Layout
+**Date:** November 5, 2026
+**Changes:**
+- **Frontend (Login.vue):** 
+  - Wrapped both the Login and Register forms in a sleek, modern card layout with a 2px gradient border (Emerald to Blue).
+  - Added a soft drop shadow behind the card to make it pop against the background.
+  - Added a Welcome Success Modal after login, displaying a bouncing emoji and progress bar before redirecting.
+
+## [Version 2.5] - Form Layout Fix & Advanced Validation UI
+**Date:** November 5, 2026
+**Changes:**
+- **Frontend (Login.vue):**
+  - Fixed the sliding animation bug where the design disappeared when clicking "Create Account" by using a proper Vue `<transition>` tag.
+  - Redesigned the Registration form to strict requirements: First Name -> Middle Name -> Last Name -> Ext Name.
+  - Added **Real-time HTML5/JS Input Restrictions**:
+    - First, Middle, Last, and Ext names physically block numbers.
+    - Phone Number physically blocks letters and limits to exactly 11 digits.
+    - Email field shows a live red warning if it is not a `@gmail.com` address.
+  - Added red asterisks (`*`) to all mandatory fields.
+  - Replaced default browser `alert()` with a custom Success Modal.
+- **Frontend (ConfirmationModal.vue):** Created a new reusable custom component to replace all native browser `confirm()` popups in the Admin panel.
+- **Frontend (SuperAdminUsers.vue):** Replaced the "Approve/Reject" native alerts with the new custom Confirmation Modal.
+- **Backend (Auth.php):** Added strict backend validation for the new registration fields (alpha-numeric usernames, letter-only names, 11-digit numeric phone numbers, and `confirm_password` matching).
+
+## [Version 2.0] - Registration & Admin Approval Workflow
+**Date:** October 2026
+**Changes:**
+- **Database:** Added `first_name`, `middle_name`, `last_name`, `extension_name`, `atbi_affiliation`, `phone_number`, and `status` (pending, approved, rejected) columns to the `users` table.
+- **Backend (Auth.php):** Blocked users from logging in if their `status` is `'pending'` or `'rejected'`.
+- **Backend (Users.php):** Added `approveUser` and `rejectUser` endpoints. Integrated CodeIgniter's Email Service so that when an admin clicks "Approve", an automatic confirmation email is sent to the user's Gmail account.
+- **Frontend (SuperAdminUsers.vue):** Added a Status column and Approve/Reject buttons so Admins can manage pending registrations.
+
+## [Version 1.5] - Global Layout & Navigation Restructuring
+**Date:** October 2026
+**Changes:**
+- **Frontend (Layout.vue):**
+  - **Header:** Added a top header with the system title and a user profile section on the right. (Removed the logo from here since it is in the Sidebar).
+  - **Navbar:** Added a secondary navigation bar below the header for quick access to ATBIs. Gave it a green-to-blue gradient design with pill-shaped active states.
+  - **Footer:** Created a new footer with 6 circular ATBI logos (3 on the left, 3 on the right), the main system logo, and copyright text in the center. Gave the footer a matching gradient background.
+  - **Sidebar:** Cleaned up the Sidebar to hold only primary links (Home, Calendar, Cart, and Admin tools). Removed "About" from the sidebar since it's now in the navbar.
+- **Frontend (Home.vue):** Removed the grid of ATBI cards. The home page now only displays a large "Welcome to ATBI" message, prompting the user to select an ATBI from the top navbar.
+
+## [Version 1.1] - Calendar Overhaul & Archive System
+**Date:** October 2026
+**Changes:**
+- **Database:** Added `is_archived` and `status` columns to the `calendar_events` table.
+- **Backend (CalendarController):** Added logic to separate permanent system holidays from custom admin events. Added Archive, Restore, and Permanent Delete endpoints.
+- **Frontend (Calendar.vue):** Replaced the "+ Add Event" button with a click-to-add feature. Clicking a day opens the modal. Enforced a 1-year view limit. System holidays render permanently in red.
+- **Frontend (AdminCalendar.vue):** Filtered out system holidays so admins only manage their custom events. Added search and month/year filters.
+- **Frontend (ArchivedCalendar.vue):** Created a brand new page for admins to restore or permanently delete archived events.
+
+## [Version 1.0] - Role Standardization & Core Setup
+**Date:** October 2026
+**Changes:**
+- **Database:** Removed the `super_admin` role. Merged all super admin privileges into the standard `admin` role. Standardized the enum to just `'user'` and `'admin'`.
+- **Backend:** Updated `requireAdmin()` checks to look for `'admin'`.
+- **Frontend:** Removed all `super_admin` references from the router and sidebar. Admin menu now shows standard management links (Products, Calendar, Users).
+- **Core Setup:** Created the Vue.js frontend and CodeIgniter 4 backend. Set up Authentication (Login, Logout), Product CRUD, and Shopping Cart. Created the initial animated gradient Login page with Playfair Display fonts.
