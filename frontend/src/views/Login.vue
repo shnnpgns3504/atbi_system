@@ -1,23 +1,34 @@
 <template>
   <div class="min-h-screen w-full flex flex-col md:flex-row">
-    <!-- LEFT: Brand Logos Panel -->
+    <!-- LEFT: Brand Logos Panel with Animated Background -->
     <div
-      class="relative bg-gradient-to-br from-emerald-700 via-green-700 to-emerald-800 
+      class="relative animated-gradient
              flex items-center justify-center p-6 md:p-12 overflow-hidden
              min-h-[45vh] md:min-h-screen md:w-1/2"
     >
+      <!-- Decorative blobs (kept as is) -->
       <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-green-400/20 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"></div>
 
-      <div class="relative z-10 text-center max-w-md">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight">
-          ATBI System
+      <div class="relative z-10 text-center max-w-md w-full flex flex-col items-center">
+        
+        <!-- MAIN SYSTEM LOGO -->
+        <img 
+            src="/logos/main.png" 
+            alt="Intertrade Logo" 
+            class="w-62 h-62 md:w-74 md:h-74 object-cover rounded-full bg-white p-2 mb-6 drop-shadow-2xl border-4 border-white/20" 
+          />
+
+        <!-- MAIN TITLE (Playfair Display) -->
+        <h1 class="font-playfair text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight drop-shadow-md">
+          ATBI Intertrade System
         </h1>
-        <p class="text-emerald-100 text-sm md:text-base mb-8 md:mb-12">
-          Agricultural Technology Business Incubator
+        
+        <p class="text-white/90 text-sm md:text-base mb-8 md:mb-12 drop-shadow">
+          Agribased Technology Business Incubator
         </p>
 
-        <div class="grid grid-cols-3 gap-3 md:gap-4">
+        <div class="grid grid-cols-3 gap-3 md:gap-4 w-full">
           <div
             v-for="(atbi, i) in atbiLogos"
             :key="i"
@@ -34,8 +45,8 @@
           </div>
         </div>
 
-        <p class="mt-6 md:mt-10 text-emerald-200 text-xs md:text-sm">
-          Benguet State University
+        <p class="mt-6 md:mt-10 text-white/80 text-xs md:text-sm">
+          &copy; 2026 <span class="font-bold text-white">ATBI Intertrade System</span>. All rights reserved.
         </p>
       </div>
     </div>
@@ -254,12 +265,12 @@ const forgotError = ref('')
 const forgotDebugOtp = ref('')
 
 const atbiLogos = [
-  { name: 'ATBI 1', logo: '/logos/atbi1.png' },
-  { name: 'ATBI 2', logo: '/logos/atbi2.png' },
-  { name: 'ATBI 3', logo: '/logos/atbi3.png' },
-  { name: 'ATBI 4', logo: '/logos/atbi4.png' },
-  { name: 'ATBI 5', logo: '/logos/atbi5.png' },
-  { name: 'ATBI 6', logo: '/logos/atbi6.png' }
+  { name: 'BSU', logo: '/logos/bsu.png' },
+  { name: 'CLSU', logo: '/logos/clsu.png' },
+  { name: 'DMMMSU', logo: '/logos/dmmmsu.png' },
+  { name: 'ISU', logo: '/logos/isu.png' },
+  { name: 'MMSU', logo: '/logos/mmsu.png' },
+  { name: 'PSU', logo: '/logos/psu.png' }
 ]
 
 function handleImgError(e: Event, index: number) {
@@ -388,6 +399,34 @@ async function resetPassword() {
 </script>
 
 <style scoped>
+/* IMPORT PLAYFAIR DISPLAY FONT */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+/* APPLY THE FONT TO THE CLASS */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+/* --- ANIMATED GRADIENT BACKGROUND --- */
+.animated-gradient {
+  background: linear-gradient(-45deg, #064e3b, #047857, #0ea5e9, #0369a1);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+/* ------------------------------------ */
+
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.3s ease;
