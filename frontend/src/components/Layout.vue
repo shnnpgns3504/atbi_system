@@ -1,101 +1,99 @@
 <template>
-  <div class="min-h-screen flex flex-col lg:flex-row">
-    <!-- Mobile Header -->
-    <header class="lg:hidden bg-emerald-700 text-white px-4 py-3 flex items-center 
-                   justify-between sticky top-0 z-40 shadow-md">
-      <h1 class="text-lg font-bold">🌱 ATBI System</h1>
-      <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2">
-        <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-        <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </header>
+  <div class="flex h-screen w-full bg-gray-50 overflow-hidden font-sans">
+    
+    <!-- MOBILE OVERLAY -->
+    <div 
+      v-if="isSidebarOpen" 
+      @click="isSidebarOpen = false"
+      class="fixed inset-0 bg-black/50 z-40 md:hidden"
+    ></div>
 
-    <!-- Overlay for mobile -->
-    <div v-if="mobileMenuOpen" 
-      @click="mobileMenuOpen = false"
-      class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
-
-    <!-- Sidebar -->
-    <aside :class="[
-      'bg-emerald-700 text-white p-4 flex flex-col z-50',
-      'fixed lg:static inset-y-0 left-0 w-64 transform transition-transform duration-300',
-      'lg:translate-x-0 lg:w-64 lg:h-screen lg:sticky lg:top-0',
-      mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-    ]">
-      <div class="flex items-center justify-between mb-6 lg:mb-8">
-        <h1 class="text-xl lg:text-2xl font-bold">🌱 ATBI</h1>
-        <button @click="mobileMenuOpen = false" class="lg:hidden p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <!-- SIDEBAR -->
+    <aside 
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-[#00563F] text-white flex flex-col transition-transform duration-300 transform md:relative md:translate-x-0"
+      :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen }"
+    >
+      <!-- Logo Area -->
+      <div class="p-6 flex items-center gap-3 border-b border-white/10">
+        <img src="/favicon.svg" alt="ATBI Logo" class="w-8 h-8" />
+        <span class="text-2xl font-bold tracking-wider">ATBI</span>
       </div>
 
-      <nav class="flex-1 space-y-1 overflow-y-auto">
-        <RouterLink to="/home" @click="mobileMenuOpen = false"
-          class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-          :class="$route.path === '/home' ? 'bg-emerald-600' : ''">
-          🏠 Home
-        </RouterLink>
-        <RouterLink to="/calendar" @click="mobileMenuOpen = false"
-          class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-          :class="$route.path === '/calendar' ? 'bg-emerald-600' : ''">
-          📅 Calendar
-        </RouterLink>
-        <RouterLink to="/cart" @click="mobileMenuOpen = false"
-          class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-          :class="$route.path === '/cart' ? 'bg-emerald-600' : ''">
-          <span>🛒 Cart</span>
-          <span v-if="auth.cartCount" class="bg-red-500 px-2 rounded-full text-xs">
-            {{ auth.cartCount }}
-          </span>
-        </RouterLink>
+      <!-- Navigation Links -->
+      <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <router-link to="/home" @click="isSidebarOpen = false" 
+          class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+          active-class="bg-[#007A59]">
+          <span>🏠</span> Home
+        </router-link>
+        <router-link to="/calendar" @click="isSidebarOpen = false" 
+          class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+          active-class="bg-[#007A59]">
+          <span>📅</span> Calendar
+        </router-link>
+        <router-link to="/cart" @click="isSidebarOpen = false" 
+          class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+          active-class="bg-[#007A59]">
+          <span>🛒</span> Cart
+        </router-link>
 
-        <!-- Admin Section -->
-        <div v-if="['admin','super_admin'].includes(auth.user?.role)" 
-          class="pt-3 mt-3 border-t border-emerald-600 space-y-1">
-          <p class="text-xs text-emerald-200 px-3 py-1">ADMIN</p>
-          <RouterLink to="/admin/products" @click="mobileMenuOpen = false"
-            class="block px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-            :class="$route.path === '/admin/products' ? 'bg-emerald-600' : ''">
-            📦 Manage Products
-          </RouterLink>
-          <RouterLink to="/admin/calendar" @click="mobileMenuOpen = false"
-            class="block px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-            :class="$route.path === '/admin/calendar' ? 'bg-emerald-600' : ''">
-            🗓️ Manage Events
-          </RouterLink>
-        </div>
-
-        <!-- Super Admin Section -->
-        <div v-if="auth.user?.role === 'super_admin'" 
-          class="pt-3 mt-3 border-t border-emerald-600 space-y-1">
-          <p class="text-xs text-amber-200 px-3 py-1">👑 SUPER ADMIN</p>
-          <RouterLink to="/superadmin/users" @click="mobileMenuOpen = false"
-            class="block px-3 py-2.5 rounded-lg hover:bg-emerald-600 text-sm"
-            :class="$route.path === '/superadmin/users' ? 'bg-emerald-600' : ''">
-            👥 Manage Users
-          </RouterLink>
-        </div>
+        <!-- Admin Section (only visible to admin) -->
+        <template v-if="auth.user?.role === 'admin'">
+          <div class="pt-6 pb-2">
+            <p class="px-3 text-xs font-semibold text-white/50 uppercase tracking-wider">Admin</p>
+          </div>
+          <router-link to="/admin/products" @click="isSidebarOpen = false" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+            active-class="bg-[#007A59]">
+            <span>📦</span> Manage Products
+          </router-link>
+          <router-link to="/admin/calendar" @click="isSidebarOpen = false" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+            active-class="bg-[#007A59]">
+            <span>🗓️</span> Manage Events
+          </router-link>
+          <router-link to="/admin/users" @click="isSidebarOpen = false" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors" 
+            active-class="bg-[#007A59]">
+            <span>👥</span> Manage Users
+          </router-link>
+        </template>
       </nav>
 
-      <div class="border-t border-emerald-600 pt-4 mt-4">
-        <p class="text-sm font-medium truncate">{{ auth.user?.full_name }}</p>
-        <p class="text-xs text-emerald-200 capitalize">{{ auth.user?.role?.replace('_',' ') }}</p>
-        <button @click="logout" 
-          class="mt-2 w-full px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm">
+      <!-- User Profile / Logout -->
+      <div class="p-4 border-t border-white/10 bg-[#004a36]">
+        <div class="mb-3 text-center md:text-left">
+          <p class="font-bold text-sm truncate">{{ auth.user?.full_name || 'Guest' }}</p>
+          <p class="text-xs text-white/70 capitalize">{{ auth.user?.role?.replace('_', ' ') || 'User' }}</p>
+        </div>
+        <button @click="handleLogout" 
+          class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-md font-medium transition-colors">
           Logout
         </button>
       </div>
     </aside>
 
-    <!-- Main -->
-    <main class="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 w-full">
-      <router-view />
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full w-full overflow-hidden relative">
+      
+      <!-- Mobile Header -->
+      <header class="md:hidden bg-white shadow-sm p-4 flex items-center justify-between z-30">
+        <div class="flex items-center gap-2">
+          <img src="/favicon.svg" alt="Logo" class="w-6 h-6" />
+          <span class="font-bold text-[#00563F]">ATBI System</span>
+        </div>
+        <button @click="isSidebarOpen = !isSidebarOpen" class="text-gray-600 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Pages Load Here -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8">
+        <router-view />
+      </div>
+
     </main>
   </div>
 </template>
@@ -107,9 +105,9 @@ import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
-const mobileMenuOpen = ref(false)
+const isSidebarOpen = ref(false)
 
-function logout() {
+const handleLogout = () => {
   auth.logout()
   router.push('/login')
 }

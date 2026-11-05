@@ -9,10 +9,18 @@ class Calendar extends BaseController
 {
     use ResponseTrait;
 
+    // User Calendar & Manage Calendar Data
     public function index()
     {
         $calendarModel = new CalendarModel();
-        return $this->respond(['success' => true, 'data' => $calendarModel->getAllActive()]);
+        // Returns all active (both holidays and custom)
+        return $this->respond(['success' => true, 'data' => $calendarModel->getActiveEvents()]);
+    }
+
+    public function archived()
+    {
+        $calendarModel = new CalendarModel();
+        return $this->respond(['success' => true, 'data' => $calendarModel->getArchivedEvents()]);
     }
 
     public function create()
@@ -22,7 +30,8 @@ class Calendar extends BaseController
         $rules = [
             'title' => 'required|min_length[2]',
             'event_date' => 'required|valid_date[Y-m-d]',
-            'event_type' => 'required|in_list[event,announcement,holiday]',
+            'event_type' => 'required|min_length[2]',
+            'status' => 'required|in_list[upcoming,finished,cancelled]'
         ];
 
         if (!$this->validate($rules)) {
@@ -37,9 +46,11 @@ class Calendar extends BaseController
             'event_end_date' => $data['event_end_date'] ?? null,
             'event_type' => $data['event_type'],
             'atbi_id' => $data['atbi_id'] ?? null,
-            'is_holiday' => $data['is_holiday'] ?? 0,
+            'is_holiday' => 0, // Admin added events are never holidays
+            'status' => $data['status'],
             'created_by' => $data['user_id'] ?? null,
-            'is_active' => 1
+            'is_active' => 1,
+            'is_archived' => 0
         ]);
 
         return $this->respond(['success' => true, 'message' => 'Event created', 'event_id' => $id], 201);
@@ -61,19 +72,39 @@ class Calendar extends BaseController
             'event_end_date' => $data['event_end_date'] ?? null,
             'event_type' => $data['event_type'],
             'atbi_id' => $data['atbi_id'] ?? null,
-            'is_holiday' => $data['is_holiday'] ?? 0
+            'status' => $data['status']
         ]);
 
         return $this->respond(['success' => true, 'message' => 'Event updated']);
     }
 
-    public function delete($id)
+    public function archive($id)
     {
         $calendarModel = new CalendarModel();
         if (!$calendarModel->find($id)) {
             return $this->respond(['success' => false, 'message' => 'Event not found'], 404);
         }
-        $calendarModel->update($id, ['is_active' => 0]);
-        return $this->respond(['success' => true, 'message' => 'Event deleted']);
+        $calendarModel->update($id, ['is_archived' => 1]);
+        return $this->respond(['success' => true, 'message' => 'Event archived successfully']);
+    }
+
+    public function restore($id)
+    {
+        $calendarModel = new CalendarModel();
+        if (!$calendarModel->find($id)) {
+            return $this->respond(['success' => false, 'message' => 'Event not found'], 404);
+        }
+        $calendarModel->update($id, ['is_archived' => 0]);
+        return $this->respond(['success' => true, 'message' => 'Event restored successfully']);
+    }
+
+    public function deletePermanent($id)
+    {
+        $calendarModel = new CalendarModel();
+        if (!$calendarModel->find($id)) {
+            return $this->respond(['success' => false, 'message' => 'Event not found'], 404);
+        }
+        $calendarModel->delete($id);
+        return $this->respond(['success' => true, 'message' => 'Event permanently deleted']);
     }
 }

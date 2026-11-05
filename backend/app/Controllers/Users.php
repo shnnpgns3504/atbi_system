@@ -9,7 +9,7 @@ class Users extends BaseController
 {
     use ResponseTrait;
 
-    private function requireSuperAdmin()
+    private function requireAdmin()
     {
         $data = $this->request->getJSON(true) ?? $this->request->getPost();
         $requesterId = (int)($data['requester_id'] ?? $this->request->getGet('requester_id') ?? 0);
@@ -21,7 +21,7 @@ class Users extends BaseController
         $userModel = new UserModel();
         $requester = $userModel->find($requesterId);
 
-        if (!$requester || $requester->role !== 'super_admin') {
+        if (!$requester || $requester->role !== 'admin') {
             return null;
         }
 
@@ -30,8 +30,8 @@ class Users extends BaseController
 
     public function index()
     {
-        if (!$this->requireSuperAdmin()) {
-            return $this->respond(['success' => false, 'message' => 'Super admin access required'], 403);
+        if (!$this->requireAdmin()) {
+            return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
         }
 
         $userModel = new UserModel();
@@ -44,8 +44,8 @@ class Users extends BaseController
 
     public function assignAdmin()
     {
-        if (!$this->requireSuperAdmin()) {
-            return $this->respond(['success' => false, 'message' => 'Super admin access required'], 403);
+        if (!$this->requireAdmin()) {
+            return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
         }
 
         $data = $this->request->getJSON(true) ?? $this->request->getPost();
@@ -63,8 +63,9 @@ class Users extends BaseController
             return $this->respond(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        if ($target->role === 'super_admin') {
-            return $this->respond(['success' => false, 'message' => 'Cannot modify super admin'], 400);
+        $requesterId = (int)($data['requester_id'] ?? 0);
+        if ($target->user_id === $requesterId) {
+            return $this->respond(['success' => false, 'message' => 'Cannot change your own role'], 400);
         }
 
         $userModel->update($targetUserId, ['role' => $newRole]);
@@ -77,8 +78,8 @@ class Users extends BaseController
 
     public function createUser()
     {
-        if (!$this->requireSuperAdmin()) {
-            return $this->respond(['success' => false, 'message' => 'Super admin access required'], 403);
+        if (!$this->requireAdmin()) {
+            return $this->respond(['success' => false, 'message' => 'Admin access required'], 403);
         }
 
         $data = $this->request->getJSON(true) ?? $this->request->getPost();

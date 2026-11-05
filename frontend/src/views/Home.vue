@@ -7,7 +7,7 @@
 
     <div v-if="loading" class="text-center py-16 text-gray-400">Loading ATBIs...</div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <RouterLink v-for="atbi in atbis" :key="atbi.atbi_id" :to="`/atbi/${atbi.slug}`"
         class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow p-6 border border-gray-100">
         <div class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-2xl font-bold text-emerald-700 mb-4">

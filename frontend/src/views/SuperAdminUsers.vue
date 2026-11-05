@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between flex-wrap gap-3">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">👑 User Management</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">👥 User Management</h1>
         <p class="text-gray-500 text-sm mt-1">Assign roles to users</p>
       </div>
       <button @click="openAddUser" 
@@ -28,7 +28,13 @@
           </thead>
           <tbody class="divide-y">
             <tr v-for="u in users" :key="u.user_id" class="hover:bg-gray-50">
-              <td class="px-4 md:px-6 py-4 font-medium">{{ u.full_name }}</td>
+              <td class="px-4 md:px-6 py-4 font-medium">
+                {{ u.full_name }}
+                <span v-if="u.user_id === auth.user?.user_id" 
+                  class="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">
+                  You
+                </span>
+              </td>
               <td class="px-4 md:px-6 py-4 text-sm text-gray-600">{{ u.username }}</td>
               <td class="px-4 md:px-6 py-4 text-sm text-gray-600">{{ u.email }}</td>
               <td class="px-4 md:px-6 py-4">
@@ -37,7 +43,7 @@
                 </span>
               </td>
               <td class="px-4 md:px-6 py-4 text-center">
-                <div v-if="u.role !== 'super_admin'" class="flex justify-center gap-1 flex-wrap">
+                <div v-if="u.user_id !== auth.user?.user_id" class="flex justify-center gap-1 flex-wrap">
                   <button v-if="u.role !== 'admin'" @click="changeRole(u, 'admin')"
                     class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
                     Make Admin
@@ -47,7 +53,7 @@
                     Remove Admin
                   </button>
                 </div>
-                <span v-else class="text-xs text-amber-600 font-medium">— Protected —</span>
+                <span v-else class="text-xs text-gray-400 italic">— You —</span>
               </td>
             </tr>
           </tbody>
@@ -108,12 +114,11 @@ const newUser = reactive({
 })
 
 function formatRole(role: string) {
-  return role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  return role.charAt(0).toUpperCase() + role.slice(1)
 }
 
 function getRoleClass(role: string) {
-  if (role === 'super_admin') return 'bg-amber-100 text-amber-700'
-  if (role === 'admin') return 'bg-blue-100 text-blue-700'
+  if (role === 'admin') return 'bg-amber-100 text-amber-700'
   return 'bg-gray-100 text-gray-700'
 }
 

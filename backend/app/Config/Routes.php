@@ -29,11 +29,17 @@ $routes->post('api/cart/update/(:num)', 'Cart::updateItem/$1');
 $routes->post('api/cart/remove/(:num)', 'Cart::remove/$1');
 $routes->post('api/cart/clear', 'Cart::clear');
 
+// Calendar (User)
+$routes->get('api/calendar', 'Calendar::index');
+
 // Calendar
 $routes->get('api/calendar', 'Calendar::index');
+$routes->get('api/calendar/archived', 'Calendar::archived');
 $routes->post('api/calendar/create', 'Calendar::create');
 $routes->post('api/calendar/update/(:num)', 'Calendar::update/$1');
-$routes->post('api/calendar/delete/(:num)', 'Calendar::delete/$1');
+$routes->post('api/calendar/archive/(:num)', 'Calendar::archive/$1');
+$routes->post('api/calendar/restore/(:num)', 'Calendar::restore/$1');
+$routes->post('api/calendar/delete/(:num)', 'Calendar::deletePermanent/$1');
 
 // Super Admin User Management
 $routes->get('api/users', 'Users::index');
