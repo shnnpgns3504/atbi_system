@@ -63,7 +63,7 @@ class Auth extends BaseController
         return $this->respond(['success' => true, 'message' => 'Registration submitted. Please wait for admin approval.', 'user_id' => $userId], 201);
     }
 
-    public function login()
+            public function login()
     {
         $data = $this->request->getJSON(true) ?? $this->request->getPost();
 
@@ -74,23 +74,40 @@ class Auth extends BaseController
             return $this->respond(['success' => false, 'message' => 'Invalid credentials'], 401);
         }
 
-        $password = is_array($user) ? $user['password'] : $user->password;
-        $isActive = is_array($user) ? $user['is_active'] : $user->is_active;
-        $status = is_array($user) ? $user['status'] : $user->status;
-
-        if (!password_verify($data['password'], $password)) {
-            return $this->respond(['success' => false, 'message' => 'Invalid credentials'], 401);
+        // 1. Check if currently locked out
+        if ($user->login_lockout_until && strtotime($user->login_lockout_until) > time()) {
+            $secondsLeft = strtotime($user->login_lockout_until) - time();
+            return $this->respond(['success' => false, 'message' => "Too many failed attempts. Try again in {$secondsLeft} seconds."], 429);
         }
 
-        if (!$isActive) {
+        // 2. Verify the password
+        if (!password_verify($data['password'], $user->password)) {
+            $attempts = $user->login_attempts + 1;
+            
+            if ($attempts >= 4) {
+                // Lock out for 30 seconds
+                $lockout = date('Y-m-d H:i:s', strtotime('+30 seconds'));
+                $userModel->update($user->user_id, ['login_attempts' => 0, 'login_lockout_until' => $lockout]);
+                return $this->respond(['success' => false, 'message' => 'Too many failed attempts. You are locked out for 30 seconds.'], 429);
+            } else {
+                $userModel->update($user->user_id, ['login_attempts' => $attempts]);
+                $remaining = 4 - $attempts;
+                return $this->respond(['success' => false, 'message' => "Invalid credentials. {$remaining} attempts remaining."], 401);
+            }
+        }
+
+        // 3. Success - Clear attempts and proceed with status checks
+        $userModel->update($user->user_id, ['login_attempts' => 0, 'login_lockout_until' => null]);
+
+        if (!$user->is_active) {
             return $this->respond(['success' => false, 'message' => 'Account deactivated'], 403);
         }
 
-        if ($status === 'pending') {
+        if ($user->status === 'pending') {
             return $this->respond(['success' => false, 'message' => 'Your account is pending admin approval.'], 403);
         }
 
-        if ($status === 'rejected') {
+        if ($user->status === 'rejected') {
             return $this->respond(['success' => false, 'message' => 'Your registration was rejected.'], 403);
         }
 
@@ -100,11 +117,11 @@ class Auth extends BaseController
             'success' => true,
             'token' => $token,
             'user' => [
-                'user_id' => is_array($user) ? $user['user_id'] : $user->user_id,
-                'username' => is_array($user) ? $user['username'] : $user->username,
-                'email' => is_array($user) ? $user['email'] : $user->email,
-                'full_name' => is_array($user) ? $user['full_name'] : $user->full_name,
-                'role' => is_array($user) ? $user['role'] : $user->role,
+                'user_id' => $user->user_id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'full_name' => $user->full_name,
+                'role' => $user->role,
             ]
         ]);
     }

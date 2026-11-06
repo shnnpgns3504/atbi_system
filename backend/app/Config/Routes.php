@@ -44,7 +44,15 @@ $routes->post('api/users/assign-role', 'Users::assignAdmin');
 $routes->post('api/users/approve', 'Users::approveUser');
 $routes->post('api/users/reject', 'Users::rejectUser');
 
-// Forgot Password
+
+// ==========================================
+// PUBLIC ROUTES (No login required)
+// ==========================================
+$routes->post('api/auth/register', 'Auth::register');
+$routes->post('api/auth/login', 'Auth::login');
+
+
+// Forgot Password Routes
 $routes->post('api/forgot/request-otp', 'ForgotPassword::requestOtp');
 $routes->post('api/forgot/verify-otp', 'ForgotPassword::verifyOtp');
 $routes->post('api/forgot/reset-password', 'ForgotPassword::resetPassword');

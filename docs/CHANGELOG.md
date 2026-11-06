@@ -188,4 +188,48 @@ This notebook contains all major updates, database changes, and file modificatio
 - **Database:** Removed the `super_admin` role. Merged all super admin privileges into the standard `admin` role. Standardized the enum to just `'user'` and `'admin'`.
 - **Backend:** Updated `requireAdmin()` checks to look for `'admin'`.
 - **Frontend:** Removed all `super_admin` references from the router and sidebar. Admin menu now shows standard management links (Products, Calendar, Users).
-- **Core Setup:** Created the Vue.js frontend and CodeIgniter 4 backend. Set up Authentication (Login, Logout), Product CRUD, and Shopping Cart. Created the initial animated gradient Login page with Playfair Display fonts.
+- **Core Setup:** Created the Vue.js frontend and CodeIgniter 4 backend. Set up Authentication (Login, Logout), Product CRUD, and Shopping Cart. Created the initial animated gradient Login page with Playfair Display fonts. 
+
+## [Version 2.8] - ATBI Registration Dropdown
+**Date:** November 6, 2026
+**Changes:**
+- **Frontend (Login.vue):**
+  - Changed the "ATBI Affiliation" text input into a dropdown `<select>` menu.
+  - The dropdown now contains the fixed list of 6 ATBIs: BSU, CLSU, ISU, DMMMSU, MMSU, and PSAU.
+  - This ensures data consistency in the database and prevents users from misspelling their affiliation.
+
+## [Version 2.9] - OTP Forgot Password & Lockout
+**Date:** November 6, 2026
+**Changes:**
+- **Database:** Added `otp_attempts` and `otp_lockout_until` columns to the `users` table.
+- **Backend (ForgotPassword.php):**
+  - Added a strict 10-minute expiration limit to OTP codes.
+  - Added a 4-attempt limit. If an incorrect OTP is entered 4 times, the user is locked out for 30 seconds.
+  - Fixed a security flaw where the OTP could be bypassed on the final reset step.
+- **Frontend (Login.vue):**
+  - Built a fully functional 3-step "Forgot Password" modal (Email -> OTP -> Reset Password).
+  - Added a 30-second countdown timer UI that disables the "Verify" button during a lockout.
+  - Automatically closes the modal and redirects the user to log in after a successful password reset.
+
+## [Version 3.0] - Custom Modals & OTP Lockout Fix
+**Date:** November 6, 2026
+**Changes:**
+- **Frontend (Login.vue):**
+  - Replaced the default browser `alert()` with a custom styled Vue modal ("Password Reset!").
+  - Fixed the wrong OTP attempt counter. The 30-second lockout timer now correctly triggers on the 4th failed attempt.
+  - Fixed the "Invalid Credentials" bug by ensuring the login function correctly verifies the new password hash after a reset.
+- **Backend (ForgotPassword.php):**
+  - The `resetPassword` function now properly clears the lockout attempts and expiration timers in the database after a successful reset.
+
+## [Version 3.1] - Login Lockout & Double-Hash Fix
+**Date:** November 6, 2026
+**Changes:**
+- **Database:** Added `login_attempts` and `login_lockout_until` columns to the `users` table to track failed login attempts.
+- **Backend (UserModel.php):** 
+  - **CRITICAL FIX:** Removed the `beforeUpdate` hook that was double-hashing passwords during a reset. Passwords are now only hashed manually by the controllers.
+  - Added the new login attempt columns to `$allowedFields`.
+- **Backend (Auth.php):** Implemented a 4-attempt limit on the login page. If a user fails 4 times, they are locked out for 30 seconds (returns a 429 status code).
+- **Backend (ForgotPassword.php):** Removed the 4-attempt limit from the OTP verification step since the lockout has been moved to the Login page.
+- **Frontend (Login.vue):** 
+  - Added a 30-second countdown timer on the Login form. The "Sign In" button is disabled and shows "Locked (30s)" when the backend locks the account.
+  - Replaced the native browser `alert()` with a custom styled "Password Reset!" success modal.
