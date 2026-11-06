@@ -316,7 +316,16 @@ const emailError = computed(() => {
 
 const phoneError = computed(() => {
   if (!regForm.phone_number) return ''
-  if (regForm.phone_number.length !== 11) return 'Must be exactly 11 digits.'
+  
+  // 1. Check if it's exactly 11 digits
+  if (!regForm.phone_number.startsWith('09')) {
+    return 'Phone number must start with 09.'
+  }
+  
+  // 2. Check if it starts with '09'
+  if (regForm.phone_number.length !== 11) {
+    return 'Phone number must be exactly 11 digits.'
+  }
   return ''
 })
 

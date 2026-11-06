@@ -122,6 +122,7 @@ class Auth extends BaseController
                 'email' => $user->email,
                 'full_name' => $user->full_name,
                 'role' => $user->role,
+                'atbi_affiliation' => $user->atbi_affiliation
             ]
         ]);
     }
