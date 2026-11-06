@@ -8,9 +8,9 @@
       class="fixed md:relative inset-y-0 left-0 z-50 w-64 bg-[#00563F] text-white flex flex-col transition-transform duration-300 transform md:translate-x-0 flex-shrink-0 h-full shadow-xl"
       :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen }"
     >
-      <div class="h-16 flex items-center justify-center gap-3 border-b border-white/10 bg-[#004a36] flex-shrink-0">
-        <img src="/logos/main.png" alt="ATBI Logo" class="w-10 h-10 rounded-full bg-white p-1" />
-        <span class="text-xl font-bold tracking-wider">ATBI</span>
+      <div class="h-32 flex items-center justify-center gap-3 border-b border-white/10 bg-[#004a36] flex-shrink-0">
+        <img src="/logos/main.png" alt="ATBI Logo" class="w-27 h-27 rounded-full bg-white p-1" />
+        <!-- <span class="text-xl font-bold tracking-wider">ATBI</span> -->
       </div>
 
       <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -111,26 +111,17 @@
         <!-- FOOTER -->
         <footer class="bg-gradient-to-r from-[#00563F] to-blue-900 text-white py-4 mt-auto flex-shrink-0 shadow-inner">
           <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-              
-              <div class="flex gap-4">
-                <img src="/logos/bsu.png" alt="BSU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-                <img src="/logos/clsu.png" alt="CLSU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-                <img src="/logos/dmmmsu.png" alt="DMMMSU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-              </div>
-
+            <!-- CHANGED: justify-center instead of justify-between (single child → center it) -->
+            <div class="flex items-center justify-center">
               <div class="flex flex-col items-center text-center">
-                <img src="/logos/main.png" alt="ATBI Main" class="w-14 h-14 rounded-full bg-white p-1 mb-1 shadow-md" />
+                <img
+                  src="/logos/main.png"
+                  alt="ATBI Main"
+                  class="w-14 h-14 rounded-full bg-white p-1 mb-1 shadow-md object-contain"
+                />
                 <p class="text-xs font-bold text-white">ATBI Intertrade System</p>
                 <p class="text-[10px] text-emerald-200 mt-0.5">&copy; 2026 All rights reserved.</p>
               </div>
-
-              <div class="flex gap-4">
-                <img src="/logos/isu.png" alt="ISU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-                <img src="/logos/mmsu.png" alt="MMSU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-                <img src="/logos/psu.png" alt="PSU" class="h-14 w-14 rounded-full object-cover bg-white p-1 shadow-sm transition-transform hover:scale-110" />
-              </div>
-
             </div>
           </div>
         </footer>

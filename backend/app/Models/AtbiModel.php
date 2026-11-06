@@ -8,7 +8,8 @@ class AtbiModel extends Model
 {
     protected $table = 'atbis';
     protected $primaryKey = 'atbi_id';
-    protected $allowedFields = ['slug', 'name', 'description', 'location', 'contact_person', 'contact_email', 'contact_phone', 'image_url', 'is_active'];
+    // ADD 'full_name' TO THIS LIST:
+    protected $allowedFields = ['slug', 'name', 'full_name', 'description', 'location', 'contact_person', 'contact_email', 'contact_phone', 'image_url', 'is_active']; 
     protected $returnType = 'object';
     protected $useTimestamps = false;
 

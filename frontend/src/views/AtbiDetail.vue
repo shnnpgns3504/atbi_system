@@ -16,7 +16,7 @@
       
       <!-- ATBI Header Banner -->
       <div class="bg-gradient-to-r from-emerald-600 to-green-700 rounded-2xl p-8 text-white relative shadow-lg">
-        <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ atbi.name }}</h1>
+        <h1 class="text-4xl font-bold text-white">{{ atbi.full_name || atbi.name }}</h1>
         <p class="text-emerald-100 mb-6 max-w-2xl">{{ atbi.description }}</p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm bg-black/10 p-4 rounded-xl">
