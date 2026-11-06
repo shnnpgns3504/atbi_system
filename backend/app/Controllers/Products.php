@@ -17,7 +17,8 @@ class Products extends BaseController
 
     public function create()
     {
-        $data = $this->request->getJSON(true) ?? $this->request->getPost();
+        // Use getPost() for FormData (since we are uploading a file now)
+        $data = $this->request->getPost();
 
         $rules = [
             'atbi_id' => 'required|integer',
@@ -29,6 +30,17 @@ class Products extends BaseController
             return $this->respond(['success' => false, 'errors' => $this->validator->getErrors()], 400);
         }
 
+        $imagePath = null;
+        $file = $this->request->getFile('image');
+        
+        // Handle Image Upload
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            // Ensure you have a folder at: public/uploads/products/
+            $file->move(FCPATH . 'uploads/products', $newName);
+            $imagePath = '/uploads/products/' . $newName;
+        }
+
         $productModel = new ProductModel();
         $id = $productModel->insert([
             'atbi_id' => $data['atbi_id'],
@@ -36,7 +48,8 @@ class Products extends BaseController
             'description' => $data['description'] ?? null,
             'price' => $data['price'],
             'stock' => $data['stock'] ?? 0,
-            'image_url' => $data['image_url'] ?? null,
+            'weight_kg' => $data['weight_kg'] ?? 1,
+            'image_url' => $imagePath,
             'is_active' => 1
         ]);
 
@@ -57,6 +70,7 @@ class Products extends BaseController
             'description' => $data['description'] ?? null,
             'price' => $data['price'],
             'stock' => $data['stock'] ?? 0,
+            'weight_kg' => $data['weight_kg'] ?? 1,
             'image_url' => $data['image_url'] ?? null,
             'is_active' => $data['is_active'] ?? 1
         ]);

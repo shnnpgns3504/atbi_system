@@ -8,7 +8,8 @@ class ProductModel extends Model
 {
     protected $table = 'products';
     protected $primaryKey = 'product_id';
-    protected $allowedFields = ['atbi_id', 'name', 'description', 'price', 'stock', 'image_url', 'is_active'];
+    // ADDED 'weight_kg' HERE
+    protected $allowedFields = ['atbi_id', 'name', 'description', 'price', 'stock', 'weight_kg', 'image_url', 'is_active'];
     protected $returnType = 'object';
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

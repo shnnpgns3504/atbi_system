@@ -46,18 +46,29 @@
       <div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-2xl font-bold text-gray-800">Products</h2>
-          <span class="text-sm text-gray-500">{{ atbi.products?.length || 0 }} items available</span>
+          <span class="text-sm text-gray-500">{{ displayedProducts.length }} items available</span>
         </div>
 
-        <div v-if="atbi.products && atbi.products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- SEARCH & EXPORT COMPONENT -->
+        <SearchExportBar 
+          :data="atbi.products || []" 
+          :atbiName="atbi.name"
+          :atbiFullName="atbi.full_name || atbi.name"
+          :atbiSlug="atbi.slug"
+          @update="displayedProducts = $event"
+        />
+
+        <!-- Product Grid -->
+        <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div 
-            v-for="product in atbi.products" 
+            v-for="product in displayedProducts" 
             :key="product.product_id"
             class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-5 border border-gray-100 flex flex-col"
           >
-            <!-- Product Image Placeholder -->
-            <div class="w-full h-40 bg-emerald-50 rounded-xl mb-4 flex items-center justify-center text-5xl">
-              🛒
+            <!-- Product Image FIXED HERE -->
+            <div class="w-full h-40 bg-emerald-50 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+              <img v-if="product.image_url" :src="getImageUrl(product.image_url)" class="w-full h-full object-cover" />
+              <span v-else class="text-5xl">🛒</span>
             </div>
             
             <div class="flex-1">
@@ -85,8 +96,8 @@
         <!-- Empty State -->
         <div v-else class="text-center py-20 text-gray-400 bg-white rounded-2xl border border-gray-100">
           <div class="text-6xl mb-4">📦</div>
-          <p class="text-lg font-medium">No products available yet.</p>
-          <p class="text-sm mt-1">Check back later for updates from this ATBI.</p>
+          <p class="text-lg font-medium">No products found.</p>
+          <p class="text-sm mt-1">Try adjusting your search.</p>
         </div>
       </div>
     </div>
@@ -95,6 +106,7 @@
     <AddProductModal 
       :show="showAddModal"
       :initial-atbi-id="atbi?.atbi_id || 0"
+      :atbiName="atbi?.name" 
       @close="showAddModal = false"
       @added="handleProductAdded"
     />
@@ -107,6 +119,7 @@ import { useRoute } from 'vue-router'
 import axiosClient from '@/axios'
 import { useAuthStore } from '@/stores/auth'
 import AddProductModal from '@/components/AddProductModal.vue'
+import SearchExportBar from '@/components/SearchExportBar.vue'
 
 const route = useRoute()
 const auth = useAuthStore()
@@ -115,28 +128,33 @@ const loading = ref(true)
 const adding = ref<number | null>(null)
 const showAddModal = ref(false)
 
-// CHECK PERMISSIONS: Can this user add products to this specific ATBI?
+const displayedProducts = ref<any[]>([])
+
 const canAddProduct = computed(() => {
   if (!auth.user) return false;
-  
-  // 1. Admins can add to any ATBI
   if (auth.user.role === 'admin') return true;
-  
-  // 2. Regular users can only add to their own ATBI
   if (auth.user.atbi_affiliation && atbi.value) {
-    // Match the user's affiliation (e.g., "BSU") with the ATBI name
     return atbi.value.name.includes(auth.user.atbi_affiliation);
   }
-  
   return false;
 });
 
-// Format price to Peso
 function formatNumber(n: any) {
   return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-// Add to cart function
+// --- NEW: FIX IMAGE URL FOR CODECIGNITER BACKEND ---
+function getImageUrl(path: string) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  
+  // Adjust this to match your CodeIgniter base URL!
+  // If you are running CI on localhost:8080, use that.
+  // If you have VITE_API_URL in your .env, it will use that.
+  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'; 
+  return `${backendUrl}${path}`;
+}
+
 async function addToCart(product: any) {
   if (!auth.user) {
     alert('Please log in to add items to cart.')
@@ -162,13 +180,13 @@ async function addToCart(product: any) {
   }
 }
 
-// Fetch ATBI Data
 async function loadAtbi() {
   loading.value = true
   try {
     const { data } = await axiosClient.get(`/atbis/${route.params.id}`)
     if (data.success) {
       atbi.value = data.data
+      displayedProducts.value = data.data.products || []
     }
   } catch (e) { 
     console.error(e) 
@@ -177,14 +195,12 @@ async function loadAtbi() {
   }
 }
 
-// Refresh the product list after a successful add
 function handleProductAdded() {
-  loadAtbi() // Re-fetch data so the new product appears instantly
+  loadAtbi()
 }
 
 onMounted(loadAtbi)
 
-// Watch for URL ID changes (e.g., switching from ATBI 1 to ATBI 2)
 watch(() => route.params.id, () => {
   loadAtbi()
 })
